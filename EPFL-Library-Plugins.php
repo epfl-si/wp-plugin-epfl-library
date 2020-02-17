@@ -6,7 +6,7 @@ Plugin URI:
 Description: provides a shortcode to transmit parameters to specific Library APP
     and get external content from this external source according to the
     transmitted parameters.
-Version: 1.0
+Version: 1.1
 Author: Raphaël REY & Sylvain VUILLEUMIER
 Author URI: https://people.epfl.ch/raphael.rey
 Author URI: https://people.epfl.ch/sylvain.vuilleumier
