@@ -139,4 +139,22 @@ function epfl_library_beast_redirect_process_shortcode($attributes, $content = n
             </script>';
 }
 add_shortcode('epfl_library_beast_redirect', 'epfl_library_beast_redirect_process_shortcode');
+
+
+function insert_beastbox() {
+    $request_uri = $_SERVER['REQUEST_URI'];
+	// Specific Custom Fields
+    $hide_beastbox = get_post_meta( get_the_ID(), 'hide_beastbox', true );
+
+	if (( $hide_beastbox != "1" ) && (!(strpos($request_uri, "wp-admin")))) {
+		if (strpos($request_uri, "/fr/")) {
+			echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" );
+		}
+		else {
+			echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox?lang=en']" );
+		}
+    }
+}
+add_action( 'the_post', 'insert_beastbox' );
+
 ?>
