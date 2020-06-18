@@ -3,10 +3,12 @@
 /*
 Plugin Name: EPFL Library Plugins
 Plugin URI:
-Description: provides a shortcode to transmit parameters to specific Library APP
+Description:
+    1: Provides a shortcode to transmit parameters to specific Library APP
     and get external content from this external source according to the
     transmitted parameters.
-Version: 1.1
+    2: Automatically inserts the Beast box in the Library pages
+Version: 1.2
 Author: Raphaël REY & Sylvain VUILLEUMIER
 Author URI: https://people.epfl.ch/raphael.rey
 Author URI: https://people.epfl.ch/sylvain.vuilleumier
@@ -139,4 +141,28 @@ function epfl_library_beast_redirect_process_shortcode($attributes, $content = n
             </script>';
 }
 add_shortcode('epfl_library_beast_redirect', 'epfl_library_beast_redirect_process_shortcode');
+
+
+function insert_beastbox() {
+
+    // Specific Custom Fields
+    $hide_beastbox = get_post_meta( get_the_ID(), 'hide_beastbox', true );
+
+    if (( $hide_beastbox != "1" ) && (!(is_admin()))) {
+        if (function_exists('pll_current_language')) {
+            if ( pll_current_language() == 'fr' ) {
+                echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" );
+            }
+            else {
+                echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox?lang=en']" );
+            }
+        }
+        // Default French
+        else {
+            echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" );
+        }
+    }
+}
+add_action( 'the_post', 'insert_beastbox' );
+
 ?>
