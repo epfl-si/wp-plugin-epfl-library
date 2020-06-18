@@ -144,7 +144,7 @@ add_shortcode('epfl_library_beast_redirect', 'epfl_library_beast_redirect_proces
 
 
 function insert_beastbox() {
-    $request_uri = $_SERVER['REQUEST_URI'];
+
     // Specific Custom Fields
     $hide_beastbox = get_post_meta( get_the_ID(), 'hide_beastbox', true );
 
