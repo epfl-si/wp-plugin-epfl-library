@@ -142,27 +142,31 @@ function epfl_library_beast_redirect_process_shortcode($attributes, $content = n
 }
 add_shortcode('epfl_library_beast_redirect', 'epfl_library_beast_redirect_process_shortcode');
 
+function insert_beastbox($content) {
 
-function insert_beastbox() {
+	// Specific Custom Fields
+	$hide_beastbox = get_post_meta( get_the_ID(), 'hide_beastbox', true );
 
-    // Specific Custom Fields
-    $hide_beastbox = get_post_meta( get_the_ID(), 'hide_beastbox', true );
+	if (( $hide_beastbox == "") && (!(is_admin()))) {
 
-    if (( $hide_beastbox != "1" ) && (!(is_admin()))) {
-        if (function_exists('pll_current_language')) {
-            if ( pll_current_language() == 'fr' ) {
-                echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" );
-            }
-            else {
-                echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox?lang=en']" );
-            }
-        }
-        // Default French
-        else {
-            echo do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" );
-        }
-    }
+		if (function_exists('pll_current_language')) {
+			if ( pll_current_language() == 'fr' ) {
+				$content .= do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" ) ;
+
+			}
+			else {
+				$content .= do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox?lang=en']" );
+			}
+		}
+		// Default French
+		else {
+			$content .= do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" );
+		}
+	}
+	return $content . "<script>
+	$('#searchbar').insertBefore('.entry-title');
+	</script>";
 }
-add_action( 'the_post', 'insert_beastbox' );
+add_action( 'the_content', 'insert_beastbox' );
 
 ?>
