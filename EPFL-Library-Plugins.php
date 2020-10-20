@@ -8,7 +8,7 @@ Description:
     and get external content from this external source according to the
     transmitted parameters.
     2: Automatically inserts the Beast box in the Library pages
-Version: 1.2
+Version: 1.3
 Author: Raphaël REY & Sylvain VUILLEUMIER
 Author URI: https://people.epfl.ch/raphael.rey
 Author URI: https://people.epfl.ch/sylvain.vuilleumier
@@ -164,8 +164,13 @@ function insert_beastbox($content) {
 		}
 	}
 	return $content . "<script>
-	$('#searchbar').insertBefore('.entry-title');
-	</script>";
+		if ($('.hero').length) {
+			$('#searchbar').insertBefore('.hero');
+		}
+		else {
+			$('#searchbar').insertBefore('.entry-title')
+		}
+		</script>";
 }
 add_action( 'the_content', 'insert_beastbox' );
 
