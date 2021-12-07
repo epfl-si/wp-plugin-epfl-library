@@ -8,38 +8,12 @@ Description:
     and get external content from this external source according to the
     transmitted parameters.
     2: Automatically inserts the Beast box in the Library pages
-Version: 1.5
+Version: 1.7
 Author: Raphaël REY & Sylvain VUILLEUMIER
 Author URI: https://people.epfl.ch/raphael.rey
 Author URI: https://people.epfl.ch/sylvain.vuilleumier
 License: Copyright (c) 2020 Ecole Polytechnique Federale de Lausanne, Switzerland
 */
-
-/*
-USAGE: [epfl_library_external_content url="xxx"]
-Required parameter:
-- url: url source of the external content
-
-Optional parameters :
-- script_url: url of an additional js script (required if script_name)
-- script_name: name of the script in order to be able to call it (required if script_url)
-- css_url: url of an additional css stylesheet (required if css_name)
-- css_name: name of the css stylesheet (required if css_url)
-
-The plugin will transmit the arguments of the current url to the external content url.
-
-*/
-
-// function epfl_library_external_content_log($message) {
-//
-//     if (WP_DEBUG === true) {
-//         if (is_array($message) || is_object($message)) {
-//             error_log(print_r($message, true));
-//         } else {
-//             error_log($message);
-//         }
-//     }
-// }
 
 function external_content_urlExists($url)
 {
@@ -57,88 +31,102 @@ function external_content_urlExists($url)
     curl_close($handle);
 }
 
-function epfl_library_external_content_process_shortcode($attributes, $content = null)
-{
-    extract(shortcode_atts(array(
-                'url' => '',
-                'script_name' => '',
-                'script_url' => '',
-                'css_name' => '',
-                'css_url' => ''
-    ), $attributes));
-
-    if (url == ''){
-      $error = new WP_Error('URL missing', 'The url parameter is missing', $url);
-      // epfl_library_external_content_log($error);
-      return 'ERROR: url parameter empty.';
-    }
-    // Add optional css
-    if ($css_name != '' and $css_url != ''){
-        wp_enqueue_style($css_name, $css_url);
-    }
-
-    // Add optional script
-    if ($script_name != '' and $script_url != ''){
-        wp_enqueue_script($script_name, $script_url);
-    }
-
-    // Test the final concatened url
-    if (external_content_urlExists($url)) {
-        $response = wp_remote_get($url . '?' . $_SERVER['QUERY_STRING']);
-        $page = $response['body'];
-        return $page;
-    } else {
-        $error = new WP_Error('not found', 'The page cannot be displayed', $url);
-        return 'ERROR: page not found.';
-        // epfl_library_external_content_log($error);
-    }
-}
-
-add_shortcode('epfl_library_external_content', 'epfl_library_external_content_process_shortcode');
-
-
-/*
-
-EPFL Library BEAST redirection
-Description: Automatically redirect to the search tool BEAST depending of the url arguments
-
-FONCTIONNEMENT:
-    Les url http://library.epfl.ch/beast/ ou http://library.epfl.ch/en/beast/ renvoient
-    à BEAST. La variante en majuscules pour BEAST http://library.epfl.ch/BEAST/ fonctionne
-    également. Des paramètres peuvent être ajouté pour effectuer directement une recherche:
-        - renvoi par défaut vers: http://beast-epfl.hosted.exlibrisgroup.com/primo_library/libweb/action/search.do?vid=EPFL
-        - l'option "?isbn=9781849965378,1849965374" effectue une recherche avancée sur
-        les isbn dans l'onglet par défaut (livres + périodiques)
-        - L'option "?query=" effectue une recherche simple dans l'onglet "tout"
-        - L'option et "?record=" effectue une recherche simple dans l'onglet "tout" en ajoutant au préalable
-        ebi01_prod devant et en vérifiant que les numéros contiennent 9 caractères. Si
-        des caractères manquent, des 0 sont ajoutés.
-
-    En séparant les isbn ou identifiants par des virgules, des requetes sur plusieurs
-    isbns sont possibles.
-
-    Les langues sont prises en compte. Dans Primo, les langues sont gérées dans les préférences.
-    Pour obtenir la langue de la page d'origine, il faut:
-        1. Détecter la langue de la page d'origine (présence de "/en/" ou non dans l'url)
-        2. Ajouter "&prefLang=en_US" ou rien à l'url ("&prefLang=fr_FR" provoque des problèmess)
-
-    La langue test sert à vérifier si le script doit être exécuté. Il ne l'est pas si
-    "/edit/" se trouve dans le pathname.
-
-UTILISATION:
-    1. Compléter/adapter les patterns
-    2. Donner une url et les patterns en paramètre au constructeur
-    3. Récupérer l'url de redirection via obj.getDestUrl()
-        Exemple: window.location.href = new Url_redirect(window.location.href, PATTERNS).getDestUrl();
+function get_beastbox_content($lang){
+/**
+* Return the HTML to display the beastbox
+* Jquery and Boostrap are required
+*
+* @param string $lang "en" or "fr". Default value is "fr".
+* @return html template
 */
+    //<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    //<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    $trad = array(
+                "search_barcontent" => "Chercher dans le catalogue BEAST",
+                "bibepfl" => "Bibliothèque de l'EPFL",
+                "lang" => "fr",
+            );
+	if ($lang == 'en'){
+		$trad = array(
+			"search_barcontent" => "Search the library catalog",
+			"bibepfl" => "EPFL Library",
+			"lang" => "en",
+		);
+	}
+
+    $beastbox_content = <<<HTML
 
 
-function epfl_library_beast_redirect_process_shortcode($attributes, $content = null){
-    return '<script>
-"use strict";function Url_redirect(e,r){var t=this,n=r;t.params_to_analyse=Object.keys(n.params);var s=function(e){var r=e.indexOf("//")+2,t=e.indexOf("/",r),n=e.indexOf("?",t);return-1===n&&(t=e.length),r>=2&&t>=0?e.substring(t,n):""},a=function(e){var r=e.indexOf("?");return-1!==r?e.substring(r):""},i=function(e){for(var r=0;r<e.length;r++)e[r].match(/^\d{3,9}$/)&&(e[r].length<9&&(e[r]="0".repeat(9-e[r].length).concat(e[r])),e[r]="ebi01_prod".concat(e[r]));return e},l=function(e){for(var r="",t=0;t<e.length;t++)0===t?r=e[0]:r+="+OR+"+e[t];return r};t.url_src={url:e},Object.defineProperty(t.url_src,"search",{get:function(){return a(t.url_src.url)}}),Object.defineProperty(t.url_src,"pathname",{get:function(){return s(t.url_src.url)}}),Object.defineProperty(t,"paramsList",{get:function(){var e=[];if(t.url_src.search.length>0)for(var r=t.url_src.search.substring(1),n=r.split("&"),s=0;s<n.length;s++){var a=n[s].split("=");if(a.length>1){var i=a[0],l=a[1].split(",");e.push({key:i,values:l})}}return e}}),Object.defineProperty(t,"lang",{get:function(){for(var e=0;e<n.lang.length;e++)if(t.url_src.pathname.indexOf(n.lang[e].test)>-1&&!1===n.lang[e].default)return e;return n.lang.length-1}}),t.url_dest={},Object.defineProperty(t.url_dest,"key",{get:function(){for(var e=0;e<t.paramsList.length;e++)if(t.params_to_analyse.indexOf(t.paramsList[e].key)>-1)return t.paramsList[e].key;return null}}),Object.defineProperty(t.url_dest,"values",{get:function(){for(var e=0;e<t.paramsList.length;e++)if(t.paramsList[e].key===t.url_dest.key){var r=t.paramsList[e].values;return"record"===t.url_dest.key&&(r=i(r)),r}return[]}}),Object.defineProperty(t.url_dest,"path",{get:function(){return l(t.url_dest.values)}}),t.getDestUrl=function(){var e=n.default_url;return t.url_dest.key&&t.url_dest.path&&(e=n.params[t.url_dest.key]+t.url_dest.path),e+=n.lang[t.lang].path}}const PATTERNS={default_url:"https://slsp-epfl.primo.exlibrisgroup.com/discovery/search?vid=41SLSP_EPF:prod",params:{isbn:"https://slsp-epfl.primo.exlibrisgroup.com/discovery/search?tab=41SLSP_EPF_MyInst_and_CI&search_scope=MyInst_and_CI&vid=41SLSP_EPF:prod&facet=rtype,include,books&query=isbn,contains,",record:"https://slsp-epfl.primo.exlibrisgroup.com/discovery/search?tab=41SLSP_EPF_DN_CI&search_scope=DN_and_CI&vid=41SLSP_EPF:prod&query=any,contains,",query:"https://slsp-epfl.primo.exlibrisgroup.com/discovery/search?tab=41SLSP_EPF_MyInst_and_CI&search_scope=MyInst_and_CI&vid=41SLSP_EPF:prod&query=any,contains,",issn:"https://slsp-epfl.primo.exlibrisgroup.com/discovery/search?tab=41SLSP_EPF_MyInst_and_CI&search_scope=MyInst_and_CI&vid=41SLSP_EPF:prod&query=issn,contains,",fulltext:"https://kissrv117.epfl.ch/beast/redirect?nebis_id="},lang:[{name:"ed",test:"/edit/",path:"",default:!1},{name:"en",test:"/en/",path:"&prefLang=en",default:!1},{name:"default",test:"",path:"",default:!0}]};var link=new Url_redirect(window.location.href,PATTERNS);0!==link.lang&&(window.location.href=link.getDestUrl());
-</script>';
+    <style>
+
+    #searchbar{
+        /* background-color: #ae0010; */
+        background-color: #FF0000;
+        height: 70px;
+    }
+    #searchbar label{
+        color:white;
+    }
+    .ico{
+        top : 5px;
+        width: 30px;
+        height: 30px;
+        fill: white;
+    }
+    </style>
+
+    <script>
+    function redirect_to_Beast(){
+
+      var query = $("#querytext").val();
+      var tab = $("#tab").val();
+      var lang = "$trad[lang]";
+      switch(tab) {
+          case "epfl":
+            tab = "41SLSP_EPF_MyInst_and_CI";
+            search_scope = "MyInst_and_CI";
+            break;
+          case "swisscovery":
+            tab = "41SLSP_EPF_DN_CI";
+            search_scope = "DN_and_CI";
+            break;
+      }
+
+      var result = "https://slsp-epfl.primo.exlibrisgroup.com/discovery/search?"+ "tab=" + tab + "&search_scope=" + search_scope + "&vid=41SLSP_EPF:prod&lang=" + lang;
+      if (query.length > 0){
+          result += "&query=any,contains," +  encodeURIComponent(query);
+      }
+      window.open(result);
+  };
+  </script>
+
+  <div class="container rounded-sm mb-5" id="searchbar">
+    <form name="beast" method="get" action="javascript:redirect_to_Beast();">
+      <div class="form-group pt-3 ">
+        <div class="form-row">
+          <div class="col-md-8 col-10">
+            <input type="text" class="form-control mr-2" id="querytext" name="querytext" placeholder="$trad[search_barcontent]" />
+          </div>
+          <select class="custom-select col-md-3 d-none d-md-block" id="tab" name="tab">
+            <option value="epfl">$trad[bibepfl]</option>
+            <option selected value="swisscovery">swisscovery</option>
+          </select>
+          <div class="ico col-md-1 col-2 text-left">
+            <a onclick="this.closest('form').submit();return false;" style="cursor:pointer">
+              <svg id="searchbutton" width="100%" height="100%" viewbox="0 0 24 24" y="264" style="transform:scale(-1,1)" xmlns="http://www.w3.org/2000/svg" fit="" preserveaspectratio="xMidYMid meet" focusable="false">
+                <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+HTML;
+
+    return $beastbox_content;
 }
-add_shortcode('epfl_library_beast_redirect', 'epfl_library_beast_redirect_process_shortcode');
 
 function insert_beastbox($content) {
 
@@ -149,16 +137,15 @@ function insert_beastbox($content) {
 
 		if (function_exists('pll_current_language')) {
 			if ( pll_current_language() == 'fr' ) {
-				$content .= do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" ) ;
-
+				$content .= get_beastbox_content("fr") ;
 			}
 			else {
-				$content .= do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox?lang=en']" );
+				$content .= get_beastbox_content("en");
 			}
 		}
 		// Default French
 		else {
-			$content .= do_shortcode( "[remote_content url='https://kissrv117.epfl.ch/beast/searchbox']" );
+			$content .= get_beastbox_content("fr");
 		}
 	}
 	return $content . "<script>
@@ -170,6 +157,8 @@ function insert_beastbox($content) {
 		}
 		</script>";
 }
+
 add_action( 'the_content', 'insert_beastbox' );
+
 
 ?>
