@@ -8,9 +8,8 @@ Description:
     and get external content from this external source according to the
     transmitted parameters.
     2: Automatically inserts the Beast box in the Library pages
-Version: 1.7
+Version: 1.8
 Author: Raphaël REY & Sylvain VUILLEUMIER
-Author URI: https://people.epfl.ch/raphael.rey
 Author URI: https://people.epfl.ch/sylvain.vuilleumier
 License: Copyright (c) 2020 Ecole Polytechnique Federale de Lausanne, Switzerland
 */
@@ -92,7 +91,7 @@ function get_beastbox_content($lang){
             break;
       }
 
-      var result = "https://slsp-epfl.primo.exlibrisgroup.com/discovery/search?"+ "tab=" + tab + "&search_scope=" + search_scope + "&vid=41SLSP_EPF:prod&lang=" + lang;
+      var result = "https://epfl.swisscovery.slsp.ch/discovery/search?"+ "tab=" + tab + "&search_scope=" + search_scope + "&vid=41SLSP_EPF:prod&lang=" + lang;
       if (query.length > 0){
           result += "&query=any,contains," +  encodeURIComponent(query);
       }
