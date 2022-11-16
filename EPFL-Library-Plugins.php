@@ -8,7 +8,7 @@ Description:
     and get external content from this external source according to the
     transmitted parameters.
     2: Automatically inserts the Beast box in the Library pages
-Version: 1.8
+Version: 1.9
 Author: Raphaël REY & Sylvain VUILLEUMIER
 Author URI: https://people.epfl.ch/sylvain.vuilleumier
 License: Copyright (c) 2020 Ecole Polytechnique Federale de Lausanne, Switzerland
