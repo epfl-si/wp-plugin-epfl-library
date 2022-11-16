@@ -61,7 +61,6 @@ function get_beastbox_content($lang){
     #searchbar{
         /* background-color: #ae0010; */
         background-color: #FF0000;
-        height: 70px;
     }
     #searchbar label{
         color:white;
@@ -71,6 +70,36 @@ function get_beastbox_content($lang){
         width: 30px;
         height: 30px;
         fill: white;
+    }
+    @media (max-width: 992px) {
+        #searchbar {
+            padding: 0 10px 0 30px;
+            height: 82px;
+        }
+        #searchbar input,
+        #searchbar select{
+            height: 50px;
+        }
+        #searchbar div.ico{
+            margin-top: 5px;
+            height: 35px;
+        }
+    }
+    @media (min-width: 992px) {
+      #searchbar {
+          padding: 0 100px 20px 100px;
+          height: 82px;
+          border-radius: 5px!important;
+          width: 100%!important;
+      }
+      #searchbar input,
+      #searchbar select{
+          height: 50px;
+      }
+      #searchbar div.ico{
+          margin-top: 5px;
+          height: 35px;
+      }
     }
     </style>
 
@@ -89,9 +118,13 @@ function get_beastbox_content($lang){
             tab = "41SLSP_EPF_DN_CI";
             search_scope = "DN_and_CI";
             break;
+          case "swisscovery plus":
+            tab = "DN_and_CI_unfiltered";
+            search_scope = "DN_and_CI_unfiltered";
+            break;
       }
 
-      var result = "https://epfl.swisscovery.slsp.ch/discovery/search?"+ "tab=" + tab + "&search_scope=" + search_scope + "&vid=41SLSP_EPF:prod&lang=" + lang;
+      var result = "https://epfl.swisscovery.slsp.ch/discovery/search?"+ "tab=" + tab + "&search_scope=" + search_scope + "&vid=41SLSP_EPF:prod&lang=" + lang + "&facet=rtype,exclude,reviews,lk";
       if (query.length > 0){
           result += "&query=any,contains," +  encodeURIComponent(query);
       }
@@ -107,8 +140,9 @@ function get_beastbox_content($lang){
             <input type="text" class="form-control mr-2" id="querytext" name="querytext" placeholder="$trad[search_barcontent]" />
           </div>
           <select class="custom-select col-md-3 d-none d-md-block" id="tab" name="tab">
-            <option value="epfl">$trad[bibepfl]</option>
-            <option selected value="swisscovery">swisscovery</option>
+            <option selected value="epfl">$trad[bibepfl]</option>
+            <option value="swisscovery">swisscovery</option>
+            <option value="swisscovery plus">swisscovery plus</option>
           </select>
           <div class="ico col-md-1 col-2 text-left">
             <a onclick="this.closest('form').submit();return false;" style="cursor:pointer">
