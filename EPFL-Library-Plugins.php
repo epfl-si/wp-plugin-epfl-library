@@ -8,7 +8,7 @@ Description:
     and get external content from this external source according to the
     transmitted parameters.
     2: Automatically inserts the Beast box in the Library pages
-Version: 1.9
+Version: 1.10
 Author: Raphaël REY & Sylvain VUILLEUMIER
 Author URI: https://people.epfl.ch/sylvain.vuilleumier
 License: Copyright (c) 2020 Ecole Polytechnique Federale de Lausanne, Switzerland
@@ -42,13 +42,11 @@ function get_beastbox_content($lang){
     //<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     $trad = array(
                 "search_barcontent" => "Chercher dans le catalogue BEAST",
-                "bibepfl" => "Bibliothèque de l'EPFL",
                 "lang" => "fr",
             );
 	if ($lang == 'en'){
 		$trad = array(
 			"search_barcontent" => "Search the library catalog",
-			"bibepfl" => "EPFL Library",
 			"lang" => "en",
 		);
 	}
@@ -64,6 +62,16 @@ function get_beastbox_content($lang){
     }
     #searchbar label{
         color:white;
+    }
+    #searchbar select:hover{
+        color:red;
+        cursor: pointer;
+    }
+    #searchbar select option{
+        color:black;
+    }
+    #searchbar select:option{
+        transition: 0.2s;
     }
     .ico{
         top : 5px;
@@ -90,7 +98,7 @@ function get_beastbox_content($lang){
           padding: 0 100px 20px 100px;
           height: 82px;
           border-radius: 5px!important;
-          width: 100%!important;
+          width: 98%!important;
       }
       #searchbar input,
       #searchbar select{
@@ -140,7 +148,7 @@ function get_beastbox_content($lang){
             <input type="text" class="form-control mr-2" id="querytext" name="querytext" placeholder="$trad[search_barcontent]" />
           </div>
           <select class="custom-select col-md-3 d-none d-md-block" id="tab" name="tab">
-            <option selected value="epfl">$trad[bibepfl]</option>
+            <option selected value="epfl">EPFL</option>
             <option value="swisscovery">swisscovery</option>
             <option value="swisscovery plus">swisscovery plus</option>
           </select>
