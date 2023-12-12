@@ -46,7 +46,7 @@ function get_beastbox_content($lang){
       "compte_lecteur_message" => "Mon compte",
       "compte_lecteur_url" => "https://go.epfl.ch/beast-compte",
       "nouveautes_message" => "Nouveautés",
-      "nouveautes_url" => "https://epfl.swisscovery.slsp.ch/discovery/collectionDiscovery?vid=41SLSP_EPF:prod&collectionId=8145983430005516"
+      "nouveautes_url" => "https://go.epfl.ch/acquisitions"
     );
 	if ($lang == 'en'){
 		$trad = array(
@@ -58,7 +58,7 @@ function get_beastbox_content($lang){
       "compte_lecteur_message" => "My acccount",
       "compte_lecteur_url" => "https://go.epfl.ch/beast-account",
       "nouveautes_message" => "New acquisitions",
-      "nouveautes_url" => "https://epfl.swisscovery.slsp.ch/discovery/collectionDiscovery?vid=41SLSP_EPF:prod&collectionId=8145983430005516&lang=en"
+      "nouveautes_url" => "https://go.epfl.ch/new-acquisitions"
 		);
 	}
 
